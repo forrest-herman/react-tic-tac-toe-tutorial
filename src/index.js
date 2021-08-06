@@ -16,45 +16,25 @@ var squares2Highlight = []
 
 function Square(props) {
     return (
-        <button className={"square " + props.squareHighlight} onClick={props.boxClick}>
+        <button className={props.squareHighlight !== null ? `square ${props.squareHighlight}` : "square"} onClick={props.boxClick}>
             {props.value}
         </button>
     )
 }
 
 class Board extends React.Component {
-    state = {
-        squares: Array(9).fill(null),
-        turnX: true,
-    }
-
-    playerTurn() {
-        return this.state.turnX ? "X" : "O"
-    }
-
-    handleClick = (i) => {
-        const squares = this.state.squares
-        // squares[i] === null ? squares[i] = this.playerTurn() : return
-
-        if (squares[i] === null && !calculateWinner(this.state.squares)) {
-            squares[i] = this.playerTurn()
-        } else return
-
-        this.setState({ squares: squares, turnX: !this.state.turnX })
+    getValue = (i) => {
+        return this.props.squares[i]
     }
 
     renderSquare(i) {
-        return <Square value={this.state.squares[i]} boxClick={() => this.handleClick(i)} squareHighlight={squares2Highlight.some((element) => element === i) ? "highlight" : ""} />
+        return <Square value={this.getValue(i)} boxClick={() => this.props.boxClick(i)} squareHighlight={squares2Highlight.some((element) => element === i) ? "highlight" : null} />
     }
 
     render() {
-        const winner = calculateWinner(this.state.squares)
-        console.log(squares2Highlight)
-        const status = winner === null ? "Next player: " + this.playerTurn() : "Winner is: " + winner
-
         return (
             <div>
-                <div className='status'>{status}</div>
+                <div className='status'>{this.props.status}</div>
                 <div className='board-row'>
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
@@ -76,17 +56,58 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+    state = {
+        history: [
+            {
+                squares: Array(9).fill(null),
+            },
+        ],
+        turnX: true,
+        stepNumber: 0,
+    }
+
+    playerTurn() {
+        return this.state.turnX ? "X" : "O"
+    }
+
+    handleClick = (i) => {
+        const history = this.state.history.slice(0, this.state.stepNumber + 1)
+        const current = history[history.length - 1]
+        const squares = current.squares.slice()
+
+        if (squares[i] === null && !calculateWinner(current.squares)) {
+            squares[i] = this.playerTurn()
+        } else return
+
+        this.setState({ history: history.concat([{ squares: squares }]), turnX: !this.state.turnX, stepNumber: history.length })
+    }
+
+    jumpTo = (step) => {
+        this.setState({ stepNumber: step, turnX: step % 2 === 0 })
+    }
+
     render() {
+        const history = this.state.history
+        const current = history[this.state.stepNumber]
+        const winner = calculateWinner(current.squares)
+        const status = winner === null ? (current.squares.some((i) => i === null) ? "Next player: " + this.playerTurn() : "Game Over") : "Winner is: " + winner
+
+        const moveHistory = history.map((element, move) => {
+            const description = move ? "Go to move #" + move : "Start Over"
+            return (
+                <li key={move}>
+                    <button onClick={() => this.jumpTo(move)}>{description}</button>
+                </li>
+            )
+        })
+
         return (
             <div className='game'>
                 <div className='game-board'>
-                    <Board />
+                    <Board squares={current.squares} boxClick={(i) => this.handleClick(i)} status={status} />
                 </div>
-                <div className='game-info'>
-                    <div>{/* status */}</div>
-                    <ol>{/* TODO */}</ol>
-                </div>
-                {/* Reset */}
+                <div className='game-info'>{this.state.stepNumber > 0 ? <ol>{moveHistory}</ol> : null}</div>
+                {/* New Game */}
             </div>
         )
     }
@@ -112,6 +133,8 @@ function calculateWinner(squares) {
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
             highlightSquares([a, b, c])
             return squares[a]
+        } else {
+            squares2Highlight = []
         }
     }
     return null

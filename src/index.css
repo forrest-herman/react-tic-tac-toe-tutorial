@@ -10,7 +10,7 @@ body {
 
 ol,
 ul {
-    padding-left: 30px;
+    padding-left: 0px;
 }
 
 .board-row {
@@ -55,12 +55,21 @@ ul {
 
 .game {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
 }
 
 .game-info {
-    margin-left: 20px;
+    margin: auto;
+}
+
+.game-info ol {
+    list-style: none;
+}
+
+.game-info li > button {
+    display: flex;
+    margin: 5px auto;
 }
 
 .square.highlight {
