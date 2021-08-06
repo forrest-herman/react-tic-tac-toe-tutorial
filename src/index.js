@@ -50,6 +50,7 @@ class Board extends React.Component {
             <div>
                 <div className='status'>{this.props.status}</div>
                 {this.renderGrid()}
+
                 {/* <div className='board-row'>
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
