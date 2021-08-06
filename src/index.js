@@ -31,11 +31,26 @@ class Board extends React.Component {
         return <Square value={this.getValue(i)} boxClick={() => this.props.boxClick(i)} squareHighlight={squares2Highlight.some((element) => element === i) ? "highlight" : null} />
     }
 
+    renderGrid() {
+        let rows = []
+        //outer loop greates rows
+        for (let row = 0; row < 3; row++) {
+            let squares = []
+            // inner loop for cols
+            for (let col = 0; col < 3; col++) {
+                squares.push(this.renderSquare(row * 3 + col))
+            }
+            rows.push(<div className='board-row'>{squares}</div>)
+        }
+        return rows
+    }
+
     render() {
         return (
             <div>
                 <div className='status'>{this.props.status}</div>
-                <div className='board-row'>
+                {this.renderGrid()}
+                {/* <div className='board-row'>
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
                     {this.renderSquare(2)}
@@ -49,7 +64,7 @@ class Board extends React.Component {
                     {this.renderSquare(6)}
                     {this.renderSquare(7)}
                     {this.renderSquare(8)}
-                </div>
+                </div> */}
             </div>
         )
     }
@@ -93,9 +108,9 @@ class Game extends React.Component {
         const status = winner === null ? (current.squares.some((i) => i === null) ? "Next player: " + this.playerTurn() : "Game Over") : "Winner is: " + winner
 
         const moveHistory = history.map((element, move) => {
-            const description = move ? "Go to move #" + move : "Start Over"
+            const description = move ? "Go to move #" + move : "Start Over" //+ " (col,row)"
             return (
-                <li key={move}>
+                <li key={move} className={move === this.state.stepNumber ? "bold" : ""}>
                     <button onClick={() => this.jumpTo(move)}>{description}</button>
                 </li>
             )
@@ -107,7 +122,6 @@ class Game extends React.Component {
                     <Board squares={current.squares} boxClick={(i) => this.handleClick(i)} status={status} />
                 </div>
                 <div className='game-info'>{this.state.stepNumber > 0 ? <ol>{moveHistory}</ol> : null}</div>
-                {/* New Game */}
             </div>
         )
     }

@@ -6,6 +6,7 @@
 body {
     font: 1rem "Century Gothic", Futura, sans-serif;
     margin: 20px;
+    background-color: #aacdfda3;
 }
 
 ol,
@@ -67,9 +68,25 @@ ul {
     list-style: none;
 }
 
+.game-info li.bold > button {
+    font-weight: 700;
+}
+
 .game-info li > button {
     display: flex;
-    margin: 5px auto;
+    margin: 10px auto;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: none;
+    background-color: #eff;
+    box-shadow: none;
+    font-size: 1rem;
+    transition-duration: 0.1s;
+}
+
+.game-info li > button:hover {
+    background-color: #ffaaae;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .square.highlight {
